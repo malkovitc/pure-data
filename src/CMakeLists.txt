@@ -171,24 +171,20 @@ endif()
 
 set(RESOURCE)
 if(WIN32 OR MSYS)
-    include(GenerateExportHeader)
-    add_library(puredata-core SHARED m_pd.h m_pd_export.h ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
-    generate_export_header(puredata-core
-        BASE_NAME puredata-core
-        EXPORT_MACRO_NAME EXTERNAL
-        EXPORT_FILE_NAME m_pd_export.h
-        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
+    add_library(puredata-core SHARED m_pd.h ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
+    target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
 
     # substitute version variables
     configure_file("pd.rc" "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
     add_executable(pd WIN32 s_entry.c "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
+    target_link_libraries(pd ${PD_NEEDED_LIBS})
 else()
     add_library(puredata-core STATIC ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
-    add_executable(pd s_entry.c)
-endif()
+    target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
 
-target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
-target_link_libraries(pd puredata-core ${PD_NEEDED_LIBS})
+    add_executable(pd s_entry.c)
+    target_link_libraries(pd puredata-core ${PD_NEEDED_LIBS})
+endif()
 
 if(UNIX AND NOT APPLE)
     add_executable(pd-watchdog s_watchdog.c)
