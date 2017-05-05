@@ -172,6 +172,7 @@ endif()
 set(RESOURCE)
 if(WIN32 OR MSYS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    set(BUILD_SHARED_LIBS ON)
     add_library(puredata-core SHARED m_pd.h ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
     target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
 
