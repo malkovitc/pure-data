@@ -80,3 +80,5 @@ include(package)
 if(APPLE)
     add_custom_target(mac_deploy SOURCES mac/cmake-build-mac.sh.in mac/codesign.sh mac/dmg.sh)
 endif()
+
+add_custom_target(app_deploy SOURCES appveyor.yml)
