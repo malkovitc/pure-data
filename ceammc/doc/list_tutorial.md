@@ -31,12 +31,45 @@ As you can see every scale change requires a lot of manipulations: doing connect
 objects creating/modification.
 
 But if we will use lists the things are much simple, we just to need pick random element
-from list. And there is object for this task: ![list.choice](obj/list.choice.png). Every time it receives list,
-it outputs random element from it. So live scale change only require to change
-list itself.
+from list. And there is object for this task: ![list.choice](obj/list.choice.png).
+Every time it receives list, it outputs random element from it.
+So live scale change only require to change list itself.
 
 Here's list version with CEAMMC objects:
 
 ### list version
 
 [![list version](list_tutorial_03.png)](list_tutorial_03.pd)
+
+
+## [list.gen]
+
+Another useful object is ![list.gen](obj/list.gen.png)
+
+It allows to generate list sequences. When it receives number, it sequentially
+outputs this number of bangs to rightmost outlet. This bangs are intended for *generator*
+object. It could be any object or abstraction that satisfies to this condition: upon
+bang it outputs some value. The output of generator should be connected to rightmost
+inlet ![list.gen](obj/list.gen.png). After all values from generator are received,
+they are packed into list and outputted.
+
+To produce list of constants:
+
+[![vanilla version](list_tutorial_04.png)](list_tutorial_04.pd)
+
+
+To produce list of random numbers >= 0 and < 10:
+
+[![vanilla version](list_tutorial_05.png)](list_tutorial_05.pd)
+
+To produce list of random notes frequencies in first octave:
+
+[![vanilla version](list_tutorial_06.png)](list_tutorial_06.pd)
+
+Random chord generator with specified modus:
+
+[![vanilla version](list_tutorial_07.png)](list_tutorial_07.pd)
+
+___________________
+
+_by Serge Poltavski_

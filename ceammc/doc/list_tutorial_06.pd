@@ -1,0 +1,13 @@
+#N canvas 0 23 499 333 12;
+#X floatatom 129 94 5 0 0 0 - - -, f 5;
+#X obj 129 118 list.gen;
+#X msg 129 168 329.628 391.995 293.665;
+#X obj 129 143 msg set;
+#X obj 210 118 random.int 60 72;
+#X obj 210 143 mtof;
+#X connect 0 0 1 0;
+#X connect 1 0 3 0;
+#X connect 1 1 4 0;
+#X connect 3 0 2 0;
+#X connect 4 0 5 0;
+#X connect 5 0 1 1;
