@@ -171,7 +171,13 @@ endif()
 
 set(RESOURCE)
 if(WIN32 OR MSYS)
-    add_library(puredata-core SHARED m_pd.h ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
+    include(GenerateExportHeader)
+    add_library(puredata-core SHARED m_pd.h m_pd_export.h ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
+    generate_export_header(puredata-core
+        BASE_NAME puredata-core
+        EXPORT_MACRO_NAME EXTERNAL
+        EXPORT_FILE_NAME m_pd_export.h
+        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
 
     # substitute version variables
     configure_file("pd.rc" "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
