@@ -173,15 +173,14 @@ set(RESOURCE)
 if(WIN32 OR MSYS)
     # substitute version variables
     configure_file("pd.rc" "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
-    list(APPEND RESOURCE "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
     add_library(puredata-core SHARED ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
+    add_executable(pd WIN32 s_entry.c "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
 else()
     add_library(puredata-core STATIC ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
+    add_executable(pd s_entry.c)
 endif()
 
 target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
-
-add_executable(pd WIN32 s_entry.c ${RESOURCE})
 target_link_libraries(pd puredata-core ${PD_NEEDED_LIBS})
 
 if(UNIX AND NOT APPLE)
