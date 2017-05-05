@@ -184,6 +184,7 @@ else()
     target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
 
     add_executable(pd s_entry.c)
+    set_target_properties(pd COMPILE_DEFINITIONS -DPD_INTERNAL)
     target_link_libraries(pd puredata-core ${PD_NEEDED_LIBS})
 endif()
 
