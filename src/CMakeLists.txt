@@ -178,7 +178,6 @@ if(WIN32 OR MSYS)
     # substitute version variables
     configure_file("pd.rc" "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
     add_executable(pd WIN32 s_entry.c "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
-    set_target_properties(pd COMPILE_FLAGS "-UPD_INTERNAL")
     target_link_libraries(pd ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES} puredata-core)
 else()
     add_library(puredata-core STATIC ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
