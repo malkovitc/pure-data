@@ -173,7 +173,7 @@ set(RESOURCE)
 if(WIN32 OR MSYS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     add_library(puredata-core SHARED m_pd.h ${D_SRC} ${G_SRC} ${M_SRC} ${S_SRC} ${X_SRC})
-#    target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
+    target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
 
     # substitute version variables
     configure_file("pd.rc" "${CMAKE_CURRENT_BINARY_DIR}/pd.rc")
@@ -184,7 +184,7 @@ else()
     target_link_libraries(puredata-core ${PD_NEEDED_LIBS} ${PLATFORM_LINK_LIBRARIES})
 
     add_executable(pd s_entry.c)
-    set_target_properties(pd COMPILE_DEFINITIONS -DPD_INTERNAL)
+    set_target_properties(pd COMPILE_DEFINITIONS -UPD_INTERNAL)
     target_link_libraries(pd puredata-core ${PD_NEEDED_LIBS})
 endif()
 
