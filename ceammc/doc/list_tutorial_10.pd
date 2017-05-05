@@ -1,0 +1,8 @@
+#N canvas 386 136 700 500 12;
+#X obj 98 59 list.seq;
+#X obj 98 84 msg set;
+#X msg 98 109 10 9 8 7 6 5 4 3 2 1;
+#X msg 98 34 10 0;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 3 0 0 0;
