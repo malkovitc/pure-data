@@ -35,7 +35,7 @@ if(WIN32)
         PATHS C:/Tcl/bin)
 
     if(NOT WISH_PATH)
-        message(FATAL_ERROR "wish.exe not found")
+        message(STATUS "wish.exe not found")
     else()
         message(STATUS "wish found: ${WISH_PATH}")
         get_filename_component(WISHAPP ${WISH_PATH} NAME)
