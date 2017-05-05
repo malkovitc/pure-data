@@ -82,6 +82,36 @@ if(WIN32)
         install(FILES ${PTHREADGC_DLL} DESTINATION ${PD_EXE_INSTALL_PATH})
     endif()
 
+    # install libsndfile-1.dll
+    find_file(SNDFILEDLL_PATH NAMES libsndfile-1.dll PATHS ${WISH_BINDIR})
+    if(SNDFILEDLL_PATH)
+        install(PROGRAMS ${SNDFILEDLL_PATH} DESTINATION ${PD_EXE_INSTALL_PATH})
+    endif()
+
+    # install libFLAC-8.dll
+    find_file(FLACDLL_PATH NAMES libFLAC-8.dll PATHS ${WISH_BINDIR})
+    if(FLACDLL_PATH)
+        install(PROGRAMS ${FLACDLL_PATH} DESTINATION ${PD_EXE_INSTALL_PATH})
+    endif()
+
+    # install libogg-0.dll
+    find_file(OGGDLL_PATH NAMES libogg-0.dll PATHS ${WISH_BINDIR})
+    if(OGGDLL_PATH)
+        install(PROGRAMS ${OGGDLL_PATH} DESTINATION ${PD_EXE_INSTALL_PATH})
+    endif()
+
+    # install libvorbis-0.dll
+    find_file(VORBISDLL_PATH NAMES libvorbis-0.dll PATHS ${WISH_BINDIR})
+    if(VORBISDLL_PATH)
+        install(PROGRAMS ${VORBISDLL_PATH} DESTINATION ${PD_EXE_INSTALL_PATH})
+    endif()
+
+    # install libvorbisenc-2.dll
+    find_file(VORBISENCDLL_PATH NAMES libvorbisenc-2.dll PATHS ${WISH_BINDIR})
+    if(VORBISENCDLL_PATH)
+        install(PROGRAMS ${VORBISENCDLL_PATH} DESTINATION ${PD_EXE_INSTALL_PATH})
+    endif()
+
     # mingw runtime libs
     get_filename_component(_MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
     set(_MINGW_BIN ${_MINGW_PATH}/../i686-w64-mingw32/bin)
@@ -121,11 +151,11 @@ if(WIN32)
     set(CMAKE_CXX_FLAGS "-mms-bitfields -O2 -funroll-loops -fomit-frame-pointer")
     list(APPEND PLATFORM_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
     set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols -lpthread")
-    set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++ -lpthread")
+    set(CMAKE_EXE_LINKER_FLAGS "-shared-libgcc -lpthread")
 endif()
 
 if(APPLE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O3 -funroll-loops -fomit-frame-pointer")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funroll-loops -fomit-frame-pointer")
 
     set(BUNDLE "Pd-${PD_MACOSX_BUNDLE_SUFFIX}.app")
     set(BUNDLE_FULL_PATH "${PROJECT_BINARY_DIR}/dist/${BUNDLE}")
@@ -183,6 +213,7 @@ if(APPLE)
             -DBUNDLE=${BUNDLE_FULL_PATH}
             -DWISH_APP=${WISH_APP}
             -DTCL_PATH=${TCL_PATH}
+            -DDYLIBBUNDLER="${CMAKE_BINARY_DIR}/ceammc/distrib/mac/dylibbundler"
             -DTK_PATH=${TK_PATH}
             -DIS_SYSTEM_TK=${IS_SYSTEM_TK}
             -DTK_VERSION=${TK_VERSION}
@@ -208,7 +239,7 @@ if(APPLE)
         COMMAND
             sh ${PROJECT_SOURCE_DIR}/mac/dmg.sh
             ${BUNDLE_FULL_PATH}
-            ${PD_MACOSX_BUNDLE_SUFFIX}
+            "${PD_MACOSX_BUNDLE_SUFFIX}-macosx-${MACOSX_VERSION}"
             ${PROJECT_SOURCE_DIR}
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         DEPENDS app)

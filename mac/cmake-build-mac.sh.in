@@ -2,6 +2,7 @@
 SRC_DIR=${PROJECT_SOURCE_DIR}
 BUILD_DIR=${PROJECT_BINARY_DIR}
 WISH=wish-shell.tgz
+DYLIBBUNDLER="${DYLIBBUNDLER}"
 
 PD_APP=$(basename ${BUNDLE})
 PD_CONTENT=$BUILD_DIR/dist/$PD_APP/Contents
@@ -101,6 +102,7 @@ extension_files $CEAMMC_EXT_BIN_DIR | while read f
 do
     echo "\t$(basename $f)"
     cp "$f" $PD_EXTRA/ceammc
+    $DYLIBBUNDLER -x $PD_EXTRA/ceammc/$(basename $f) -b -cd -d $PD_EXTRA/ceammc -p @loader_path/ -of
 done
 
 echo "Copying Additional extra:"
@@ -116,6 +118,7 @@ rm $PD_EXTRA/ceammc/index-help.pd
 chmod 0444 $PD_EXTRA/ceammc/*-help.pd
 cp $SRC_DIR/ceammc/ext/doc/index-help.pd $PD_EXTRA
 chmod 0444 $PD_EXTRA/index-help.pd
+cp $SRC_DIR/ceammc/ext/ceammc_objects.txt $PD_TCL/ceammc
 
 echo "Copy about file..."
 cat $BUILD_DIR/ceammc/ext/doc/about.pd | sed "s/%GIT_BRANCH%/$GIT_BRANCH/g" | \
@@ -127,7 +130,7 @@ echo "Copying CICM/Cream files:"
 cp $BUILD_DIR/ceammc/extra/CreamLibrary/creammc.d_fat $PD_EXTRA/ceammc
 cp -R $SRC_DIR/ceammc/extra/CreamLibrary/Package/Cream/helps $PD_EXTRA/ceammc
 cp $SRC_DIR/ceammc/extra/CreamLibrary/Package/Cream/misc/* $PD_EXTRA/ceammc/helps
-cp $SRC_DIR/ceammc/extra/CreamLibrary/ceammc_objects.txt $PD_TCL/ceammc
+cp $SRC_DIR/ceammc/extra/CreamLibrary/cream_objects.txt $PD_TCL/ceammc
 
 echo "Copying license..."
 cp $SRC_DIR/License.txt Scripts
@@ -141,36 +144,7 @@ cd ..
 mkdir -p Frameworks
 mkdir -p $LIBDIR
 
-otool_id() {
-    /usr/bin/otool -DX "$1" | tail -1
-}
-
-otool_deps() {
-    /usr/bin/otool -LX "$1" | sed -n /^$'\t'/p | cut -f2 | cut -d ' ' -f1
-}
-
-dep_fix() {
-    echo "FIX dependency: \"$1\" in \"$2\""
-    DEP_PATH_IN_BUNDLE=$LIBDIR/$(basename $1)
-    # copy in bundle
-    cp "$1" $DEP_PATH_IN_BUNDLE
-    chown $(whoami) $DEP_PATH_IN_BUNDLE
-    chmod +w $DEP_PATH_IN_BUNDLE
-
-    # get dep lib old id
-    DEP_ORIG_ID=$(otool_id $DEP_PATH_IN_BUNDLE)
-    DEP_NEW_ID="@executable_path/../lib/$(basename $1)"
-    echo "    change \"$DEP_ORIG_ID\" to \"$DEP_NEW_ID\" in \"$2\""
-    # change in dep
-    install_name_tool -id $DEP_NEW_ID $DEP_PATH_IN_BUNDLE
-    # change in exec
-    install_name_tool -change $DEP_ORIG_ID $DEP_NEW_ID $2
-}
-
-otool_deps "$EXECFILE" | grep -v portmidi | grep -v libSystem | grep -v /System/Library | grep -v CoreFoundation | while read shlib
-do
-    dep_fix $shlib $EXECFILE
-done
+$DYLIBBUNDLER -x $EXECFILE -b -cd -d $LIBDIR -p $NEWLIBPATH -of
 
 #copy Tcl${TK_VERSION}
 if [ $IS_SYSTEM_TK -eq 0 ]

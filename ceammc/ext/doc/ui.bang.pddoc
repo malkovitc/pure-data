@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <pddoc version="1.0">
     <object name="ui.bang" type="gui">
         <title>ui.bang</title>
@@ -22,6 +22,10 @@
         <methods>
             <method name="dump">dumps all object info to Pd console window.</method>
         </methods>
+        <properties>
+            <property name="@send" type="symbol">send destination</property>
+            <property name="@receive" type="symbol">receive source</property>
+        </properties>
         <inlets>
             <inlet>
                 <xinfo on="bang">outputs bang</xinfo>
@@ -48,4 +52,3 @@
         </example>
     </object>
 </pddoc>
-

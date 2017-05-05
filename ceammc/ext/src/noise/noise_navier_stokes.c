@@ -6,6 +6,7 @@ a - navierstokes © andré sier 20030914
 a port from RD's navier-stokes
 
 his INFO!
+*/
 /* chaos collection - 1996, Richard Dudas, IRCAM */
 /* updated summer 96 for CodeWarrior PPC/68k */
 /* navier-stokes equation solved using heuns' method */
@@ -34,9 +35,6 @@ With 28.73 < R1 > 29.0 and R2 ± = 33.43.
 */
 
 // CEAMMC pd library
-
-//#include "ext.h"
-//#include "ext_common.h"
 
 #include "cicm_wrapper.h"
 
@@ -70,7 +68,7 @@ void navierstokes_set(navierstokes* x, t_symbol* msg, short argc, t_atom* argv);
 
 void navierstokes_assist(navierstokes* x, void* b, long m, long a, char* s);
 
-t_eclass* noise_navierstokes_class;
+static t_eclass* noise_navierstokes_class;
 
 void* navierstokes_new(t_symbol* msg, short argc, t_atom* argv) //input the args
 {
@@ -299,20 +297,17 @@ void setup_noise0x2enavier_stokes()
         (t_typ_method)(navierstokes_free),
         sizeof(navierstokes), 0, A_GIMME, 0);
 
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_bang, "bang", A_GIMME, 0);
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_set, "set", A_GIMME, 0);
+    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_bang,  "bang",  A_GIMME, 0);
+    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_set,   "set",   A_GIMME, 0);
     eclass_addmethod(noise_navierstokes_class, (method)navierstokes_reset, "reset", A_GIMME, 0);
 
     eclass_addmethod(noise_navierstokes_class, (method)navierstokes_dt, "dt", A_DEFFLOAT, 0);
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_a, "a", A_DEFFLOAT, 0);
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_r, "r", A_DEFFLOAT, 0);
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_c, "c", A_DEFFLOAT, 0);
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_b, "b", A_DEFFLOAT, 0);
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_c, "c", A_DEFFLOAT, 0);
-    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_d, "d", A_DEFFLOAT, 0);
+    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_a,  "a",  A_DEFFLOAT, 0);
+    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_r,  "r",  A_DEFFLOAT, 0);
+    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_c,  "c",  A_DEFFLOAT, 0);
+    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_b,  "b",  A_DEFFLOAT, 0);
+    eclass_addmethod(noise_navierstokes_class, (method)navierstokes_d,  "d",  A_DEFFLOAT, 0);
     eclass_addmethod(noise_navierstokes_class, (method)navierstokes_om, "om", A_DEFFLOAT, 0);
-    //    post("A-Chaos Lib :: a-baker  " __DATE__ " " __TIME__ "                                   ©   a n d r é s i e r   2 0 0 4   all rights reserved", tick, 0);
-    post("noise.navier_stokes: part of A-Chaos library, (C) 2004 André Sier");
 }
 
 

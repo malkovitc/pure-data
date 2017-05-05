@@ -41,7 +41,7 @@ public:
 };
 
 class BaseObject {
-    PdArgs pd_;
+    const PdArgs pd_;
     typedef std::vector<t_inlet*> InletList;
     typedef std::vector<t_outlet*> OutletList;
     typedef std::vector<t_symbol*> SymbolList;
@@ -50,19 +50,41 @@ class BaseObject {
     OutletList outlets_;
     SymbolList inlets_s_;
     Properties props_;
+    AtomList positional_args_;
     t_symbol* receive_from_;
 
 public:
     typedef AtomList (BaseObject::*GetterFn)() const;
     typedef void (BaseObject::*SetterFn)(const AtomList&);
 
+    /**
+     * @note if adding new type: see static to_string in ceammc_object.cpp
+     */
+    enum ArgumentType {
+        ARG_FLOAT = 0,
+        ARG_INT,
+        ARG_NATURAL,
+        ARG_SYMBOL,
+        ARG_PROPERTY,
+        ARG_SNONPROPERTY,
+        ARG_BOOL
+    };
+
 public:
     BaseObject(const PdArgs& args);
     virtual ~BaseObject();
 
-    inline AtomList& args() { return pd_.args; }
-    inline const AtomList& args() const { return pd_.args; }
-    void parseArguments();
+    Atom positionalArgument(size_t pos, const Atom& def = Atom()) const;
+    t_float positionalFloatArgument(size_t pos, t_float def = 0.f) const;
+    t_symbol* positionalSymbolArgument(size_t pos, t_symbol* def = 0) const;
+    inline const AtomList& positionalArguments() const { return positional_args_; }
+    virtual void parseProperties();
+
+    bool checkArg(const Atom& atom, ArgumentType type, int pos = -1) const;
+    bool checkArgs(const AtomList& lst, ArgumentType a1, t_symbol* method = 0) const;
+    bool checkArgs(const AtomList& lst, ArgumentType a1, ArgumentType a2, t_symbol* method = 0) const;
+    bool checkArgs(const AtomList& lst, ArgumentType a1, ArgumentType a2, ArgumentType a3, t_symbol* method = 0) const;
+    bool checkArgs(const AtomList& lst, ArgumentType a1, ArgumentType a2, ArgumentType a3, ArgumentType a4, t_symbol* method = 0) const;
 
     /**
      * Returns object class name as string.
@@ -72,7 +94,7 @@ public:
     /**
      * Returns pointer to pd object struct, if you need manually call pd fuctions.
      */
-    inline t_object* owner() { return pd_.owner; }
+    inline t_object* owner() const { return pd_.owner; }
 
     /**
      * Dumps object info to Pd window
@@ -190,8 +212,10 @@ public:
      * @param msg - message value
      */
     virtual void messageTo(size_t n, const Message& msg);
-    void anyTo(size_t n, t_symbol* s, const Atom& a);
-    void anyTo(size_t n, t_symbol* s, const AtomList& l);
+
+    virtual void anyTo(size_t n, const AtomList& l);
+    virtual void anyTo(size_t n, t_symbol* s, const Atom& a);
+    virtual void anyTo(size_t n, t_symbol* s, const AtomList& l);
 
     virtual bool processAnyInlets(t_symbol* sel, const AtomList& lst);
     virtual bool processAnyProps(t_symbol* sel, const AtomList& lst);
@@ -211,6 +235,10 @@ protected:
     AtomList propNumInlets();
     AtomList propNumOutlets();
     AtomList listAllProps() const;
+    const AtomList& args() const { return pd_.args; }
+
+private:
+    void extractPositionalArguments();
 };
 }
 

@@ -15,6 +15,8 @@
 #define CEAMMC_OBJECTCLASS_H
 
 #include <m_pd.h>
+
+#include <exception>
 #include <map>
 #include <set>
 #include <string>
@@ -137,10 +139,34 @@ public:
         methods_[s] = fn;
     }
 
+    void addAlias(const char* name)
+    {
+        class_addcreator(reinterpret_cast<t_newmethod>(object_new), gensym(name), A_GIMME, A_NULL);
+    }
+
     static void* object_new(t_symbol*, int argc, t_atom* argv)
     {
-        ObjectProxy* x = reinterpret_cast<ObjectProxy*>(pd_new(class_));
-        x->impl = new T(PdArgs(AtomList(argc, argv), class_name_, &x->pd_obj));
+        ObjectProxy* x = 0;
+        try {
+            x = reinterpret_cast<ObjectProxy*>(pd_new(class_));
+            x->impl = new T(PdArgs(AtomList(argc, argv), class_name_, &x->pd_obj));
+            x->impl->parseProperties();
+        } catch (std::exception& e) {
+            x->impl = 0;
+            pd_free(&x->pd_obj.te_g.g_pd);
+            x = 0;
+
+            char buf[100];
+            snprintf(buf, 99, "%s", e.what());
+            pd_error(0, "[ceammc] can't create object [%s]: %s", class_name_->s_name, buf);
+        } catch (...) {
+            x->impl = 0;
+            pd_free(&x->pd_obj.te_g.g_pd);
+            x = 0;
+
+            pd_error(0, "[ceammc] can't create object [%s]", class_name_->s_name);
+        }
+
         return x;
     }
 

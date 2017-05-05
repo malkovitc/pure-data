@@ -49,11 +49,9 @@ References
 #include <math.h>
 #include <stdbool.h>
 
-//#include <math.h>
-
 typedef struct _lyapunov {
     t_object c_ob;
-    void *c_out, *c_out2; // outlets
+    t_outlet *c_out, *c_out2; // outlets
     double a[6], b[6], nx, ny;
     double ainit[6], binit[6], nxinit, nyinit;
     bool om;
@@ -73,7 +71,7 @@ void lyapunov_ny(lyapunov* x, double max);
 void lyapunov_om(lyapunov* x, long max);
 
 void lyapunov_assist(lyapunov* x, void* b, long m, long a, char* s);
-void* lyapunov_class;
+static t_eclass* lyapunov_class;
 
 void* lyapunov_new(t_symbol* msg, short argc, t_atom* argv)
 {
@@ -283,7 +281,7 @@ void lyapunov_a(lyapunov* x, t_symbol* msg, short argc, t_atom* argv)
             x->ainit[5] = (double)argv[5].a_w.w_float;
         else if (argv[5].a_type == A_FLOAT)
             x->ainit[5] = (double)argv[5].a_w.w_float;
-        x->ainit[5] = x->ainit[5];
+        x->a[5] = x->ainit[5];
     }
 
     if (argc > 4) {
@@ -422,8 +420,6 @@ void setup_noise0x2elyapunov()
         (t_typ_method)(lyapunov_free),
         sizeof(lyapunov), 0, A_GIMME, 0);
 
-    //eclass_addmethod(lorenz_class, (method)baker_bang, "bang", A_GIMME, 0);
-
     eclass_addmethod(lyapunov_class, (method)lyapunov_bang, "bang", A_GIMME, 0);
     eclass_addmethod(lyapunov_class, (method)lyapunov_reset, "reset", A_GIMME, 0);
     eclass_addmethod(lyapunov_class, (method)lyapunov_set, "set", A_GIMME, 0);
@@ -432,8 +428,6 @@ void setup_noise0x2elyapunov()
     eclass_addmethod(lyapunov_class, (method)lyapunov_nx, "x", A_DEFFLOAT, 0);
     eclass_addmethod(lyapunov_class, (method)lyapunov_ny, "y", A_DEFFLOAT, 0);
     eclass_addmethod(lyapunov_class, (method)lyapunov_om, "om", A_DEFFLOAT, 0);
-    
-    post("noise.lyapunov: part of A-Chaos library, (C) 2004 André Sier");
 }
 
 

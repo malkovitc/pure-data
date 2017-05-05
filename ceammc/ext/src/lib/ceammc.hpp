@@ -5,9 +5,16 @@
 #include <cmath>
 #include <cstring>
 #include <functional>
+#include <string>
 #include <vector>
 
 namespace ceammc {
+
+std::vector<std::string> currentExtensionList();
+
+std::string get_env(const char* varname);
+void set_env(const char* varname, const char* val);
+
 namespace math {
     template <class T>
     static inline T ceil(T v);
@@ -123,8 +130,6 @@ namespace pd {
             return atom_equals(a, b);
         }
     };
-
-    void gensym_info(t_ceammc_gensym_info* info);
 }
 }
 

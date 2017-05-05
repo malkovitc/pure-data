@@ -1,7 +1,8 @@
 declare name "Ceammc PureData misc utils";
 declare version "0.1";
 
-ba = library("basic.lib");
+ba = library("basics.lib");
+si = library("signals.lib");
 
 // in puredata 0db = 100db
 db_pd2faust(v) = (v - 100);
@@ -32,3 +33,10 @@ with {
     wet(in, fx, g) = fx : map(in, *(g));
 };
 
+// fx-wrap
+fx_wrap_mono(ui_bypass, ui_drywet, fx) = _ : ba.bypass1(ui_bypass, effect)
+with {
+    effect = fx_drywet(_, fx, ui_drywet);
+};
+
+fx_wrap2(bypass, drywet, fx) = _,_ : ba.bypass2(bypass, fx_drywet(bus(2), fx, drywet)) : _,_;

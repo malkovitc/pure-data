@@ -141,6 +141,16 @@ void BaseObject::messageTo(size_t n, const Message& msg)
     msg.output(outlets_[n]);
 }
 
+void BaseObject::anyTo(size_t n, const AtomList& l)
+{
+    if (n >= outlets_.size()) {
+        OBJ_ERR << "invalid outlet index: " << n;
+        return;
+    }
+
+    l.outputAsAny(outlets_[n]);
+}
+
 void BaseObject::anyTo(size_t n, t_symbol* s, const Atom& a)
 {
     if (n >= outlets_.size()) {
@@ -237,6 +247,15 @@ AtomList BaseObject::listAllProps() const
     return res;
 }
 
+void BaseObject::extractPositionalArguments()
+{
+    int idx = pd_.args.findPos(isProperty);
+    if (idx < 0)
+        idx = pd_.args.size();
+
+    positional_args_ = pd_.args.slice(0, idx);
+}
+
 t_outlet* BaseObject::createOutlet(bool signal)
 {
     t_outlet* out = outlet_new(pd_.owner, signal ? &s_signal : &s_anything);
@@ -293,6 +312,8 @@ BaseObject::BaseObject(const PdArgs& args)
     , receive_from_(0)
 {
     createCbProperty("@*", &BaseObject::listAllProps);
+
+    extractPositionalArguments();
 }
 
 BaseObject::~BaseObject()
@@ -303,7 +324,25 @@ BaseObject::~BaseObject()
     freeProps();
 }
 
-void BaseObject::parseArguments()
+Atom BaseObject::positionalArgument(size_t pos, const Atom& def) const
+{
+    return pos < positional_args_.size() ? positional_args_[pos] : def;
+}
+
+t_float BaseObject::positionalFloatArgument(size_t pos, t_float def) const
+{
+    return pos < positional_args_.size() ? positional_args_[pos].asFloat(def) : def;
+}
+
+t_symbol* BaseObject::positionalSymbolArgument(size_t pos, t_symbol* def) const
+{
+    if (pos >= positional_args_.size())
+        return def;
+
+    return positional_args_[pos].isSymbol() ? positional_args_[pos].asSymbol() : def;
+}
+
+void BaseObject::parseProperties()
 {
     std::deque<AtomList> p = pd_.args.properties();
     for (size_t i = 0; i < p.size(); i++) {
@@ -319,12 +358,149 @@ void BaseObject::parseArguments()
 
         props_[pname]->set(p[i].slice(1));
     }
+}
 
-    int idx = pd_.args.findPos(isProperty);
-    if (idx < 0)
-        return;
+bool BaseObject::checkArg(const Atom& atom, BaseObject::ArgumentType type, int pos) const
+{
+#define ARG_ERROR(msg)           \
+    {                            \
+        std::ostringstream os;   \
+        os << msg;               \
+        if (pos >= 0)            \
+            os << " at " << pos; \
+        OBJ_ERR << os.str();     \
+        return false;            \
+    }
 
-    pd_.args = pd_.args.slice(0, idx);
+    switch (type) {
+    case ARG_FLOAT:
+        if (!atom.isFloat())
+            ARG_ERROR("float expected");
+        break;
+    case ARG_SYMBOL:
+        if (!atom.isSymbol())
+            ARG_ERROR("symbol expected");
+        break;
+    case ARG_PROPERTY:
+        if (!atom.isProperty())
+            ARG_ERROR("property expected");
+        break;
+    case ARG_SNONPROPERTY:
+        if (!atom.isSymbol() || atom.isProperty())
+            ARG_ERROR("symbol and non property expected");
+        break;
+    case ARG_INT:
+        if (!atom.isInteger())
+            ARG_ERROR("integer expected");
+        break;
+    case ARG_NATURAL:
+        if (!atom.isNatural())
+            ARG_ERROR("natural expected");
+        break;
+    case ARG_BOOL:
+        if (!atom.isFloat())
+            ARG_ERROR("boolean expected");
+
+        if (atom.asFloat() != 0.f && atom.asFloat() != 1.f)
+            ARG_ERROR("only 1 or 0 accepted");
+
+        break;
+    }
+
+    return true;
+
+#undef ARG_ERROR
+}
+
+static const char* to_string(BaseObject::ArgumentType a)
+{
+    static const char* names[] = {
+        "float",
+        "int",
+        "natural",
+        "symbol",
+        "property",
+        "non-property symbol",
+        "bool"
+    };
+
+    return names[a];
+}
+
+bool BaseObject::checkArgs(const AtomList& lst, ArgumentType a1, t_symbol* method) const
+{
+    if (lst.size() < 1
+        || !checkArg(lst[0], a1, 0)) {
+
+        if (method)
+            OBJ_ERR << "Usage: " << method->s_name << " " << to_string(a1);
+
+        return false;
+    }
+
+    return true;
+}
+
+bool BaseObject::checkArgs(const AtomList& lst, BaseObject::ArgumentType a1,
+    BaseObject::ArgumentType a2, t_symbol* method) const
+{
+    if (lst.size() < 2
+        || !checkArg(lst[0], a1, 0)
+        || !checkArg(lst[1], a2, 1)) {
+
+        if (method)
+            OBJ_ERR << "Usage: " << method->s_name
+                    << " " << to_string(a1)
+                    << " " << to_string(a2);
+
+        return false;
+    }
+
+    return true;
+}
+
+bool BaseObject::checkArgs(const AtomList& lst, BaseObject::ArgumentType a1,
+    BaseObject::ArgumentType a2, BaseObject::ArgumentType a3, t_symbol* method) const
+{
+    if (lst.size() < 3
+        || !checkArg(lst[0], a1, 0)
+        || !checkArg(lst[1], a2, 1)
+        || !checkArg(lst[2], a3, 2)) {
+
+        if (method)
+            OBJ_ERR << "Usage: " << method->s_name
+                    << " " << to_string(a1)
+                    << " " << to_string(a2)
+                    << " " << to_string(a3);
+
+        return false;
+    }
+
+    return true;
+}
+
+bool BaseObject::checkArgs(const AtomList& lst, BaseObject::ArgumentType a1,
+    BaseObject::ArgumentType a2, BaseObject::ArgumentType a3,
+    BaseObject::ArgumentType a4, t_symbol* method) const
+{
+
+    if (lst.size() < 4
+        || !checkArg(lst[0], a1, 0)
+        || !checkArg(lst[1], a2, 1)
+        || !checkArg(lst[2], a3, 2)
+        || !checkArg(lst[3], a4, 3)) {
+
+        if (method)
+            OBJ_ERR << "Usage: " << method->s_name
+                    << " " << to_string(a1)
+                    << " " << to_string(a2)
+                    << " " << to_string(a3)
+                    << " " << to_string(a4);
+
+        return false;
+    }
+
+    return true;
 }
 
 void BaseObject::dump() const

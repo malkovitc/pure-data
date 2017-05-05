@@ -85,6 +85,11 @@ size_t AtomList::size() const
     return atoms_.size();
 }
 
+void AtomList::reserve(size_t n)
+{
+    atoms_.reserve(n);
+}
+
 bool AtomList::empty() const
 {
     return atoms_.empty();
@@ -311,6 +316,36 @@ bool AtomList::hasProperty(const std::string& name) const
     return false;
 }
 
+AtomList AtomList::map(AtomFloatMapFunction f) const
+{
+    AtomList res(*this);
+
+    for (size_t i = 0; i < res.size(); i++)
+        res[i].apply(f);
+
+    return res;
+}
+
+AtomList AtomList::map(AtomSymbolMapFunction f) const
+{
+    AtomList res(*this);
+
+    for (size_t i = 0; i < res.size(); i++)
+        res[i].apply(f);
+
+    return res;
+}
+
+AtomList AtomList::map(AtomMapFunction f) const
+{
+    AtomList res(*this);
+
+    for (size_t i = 0; i < res.size(); i++)
+        res[i] = f(res[i]);
+
+    return res;
+}
+
 AtomList AtomList::slice(int start) const
 {
     if (start >= static_cast<int>(size()))
@@ -377,19 +412,6 @@ t_atom* AtomList::toPdData() const
 {
     return reinterpret_cast<t_atom*>(const_cast<Atom*>(atoms_.data()));
 }
-
-//std::string AtomList::toString()
-//{
-//    std::string ret = "";
-//
-//    //iterator??
-//    for (int i=0; i<this->size();i++)
-//    {
-//        ret = ret + this->at(i).asString() + (i!=(this->size()-1)?" ":"");
-//    }
-//
-//    return ret;
-//};
 
 void AtomList::append(const Atom& a)
 {
@@ -471,6 +493,31 @@ const Atom* AtomList::first() const
 const Atom* AtomList::last() const
 {
     return const_cast<AtomList*>(this)->last();
+}
+
+bool AtomList::isBang() const
+{
+    return empty();
+}
+
+bool AtomList::isFloat() const
+{
+    return size() == 1 && atoms_.front().isFloat();
+}
+
+bool AtomList::isSymbol() const
+{
+    return size() == 1 && atoms_.front().isSymbol();
+}
+
+bool AtomList::isProperty() const
+{
+    return size() == 1 && atoms_.front().isProperty();
+}
+
+bool AtomList::isList() const
+{
+    return size() > 1;
 }
 
 void AtomList::clear()
@@ -1016,7 +1063,19 @@ void to_outlet(t_outlet* x, const AtomList& a)
         return;
     }
 
-    outlet_list(x, &s_list, static_cast<int>(a.size()), a.toPdData());
+    t_symbol* sel = 0;
+    if (a.isList())
+        sel = &s_list;
+    else if (a.isFloat())
+        sel = &s_float;
+    else if (a.isSymbol())
+        sel = &s_symbol;
+    else if (a.isBang())
+        sel = &s_bang;
+    else
+        sel = &s_list;
+
+    outlet_anything(x, sel, static_cast<int>(a.size()), a.toPdData());
 }
 
 std::ostream& operator<<(std::ostream& os, const AtomList& l)
