@@ -195,7 +195,7 @@ fi
 echo "Copying Hoa..."
 mkdir -p $PD_EXTRA/hoa
 cp $BUILD_DIR/ceammc/extra/hoa/*.@(d_fat|d_amd64|d_i386|pd_darwin) $PD_EXTRA/hoa
-cp $SRC_DIR/ceammc/extra/hoa/HoaLibrary-PD/Package/Hoa/helps/*.pd $PD_EXTRA/hoa
+cp $SRC_DIR/ceammc/extra/hoa/HoaLibrary-PD/Package/Hoa/helps/*.pd $PD_EXTRA/hoa/helps
 
 # install soundtouch~ to ceammc
 echo "Copying SoundTouch external..."

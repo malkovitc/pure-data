@@ -41,7 +41,7 @@ macro(ceammc_add_test title name)
     target_link_libraries(${name} tests_main_lib ceammc_core ceammc_base puredata-core ceammc_core)
     # boost literals fix
     if(UNIX)
-    # set_target_properties(hoa PROPERTIES COMPILE_FLAGS "-fext-numeric-literals")
+    set_target_properties(${name} PROPERTIES COMPILE_FLAGS "-fext-numeric-literals")
     add_definitions(-DBOOST_MATH_DISABLE_FLOAT128)
     endif()
     set_test_command(${title} ${name})
