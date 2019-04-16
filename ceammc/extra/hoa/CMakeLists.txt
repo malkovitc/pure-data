@@ -89,4 +89,6 @@ pd_add_external(NAME hoa
 
 if(UNIX)
     set_target_properties(hoa PROPERTIES COMPILE_FLAGS "-fPIC")
+    set_target_properties(hoa_static PROPERTIES COMPILE_FLAGS "-fPIC")
+    set_target_properties(hoa_compatible_wrapper PROPERTIES COMPILE_FLAGS "-fPIC")
 endif()
