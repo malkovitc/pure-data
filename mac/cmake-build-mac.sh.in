@@ -191,6 +191,11 @@ then
     cp $LIB_LEAPMOTION $PD_EXTRA/leapmotion
 fi
 
+#
+echo "Copying Hoa..."
+mkdir -p $PD_EXTRA/hoa
+cp $BUILD_DIR/ceammc/extra/hoa/*.@(d_fat|d_amd64|d_i386|pd_darwin) $PD_EXTRA/hoa
+
 # install soundtouch~ to ceammc
 echo "Copying SoundTouch external..."
 cp $BUILD_DIR/ceammc/extra/SoundTouch/pd/*.@(d_fat|d_amd64|d_i386|pd_darwin) $PD_EXTRA/ceammc
