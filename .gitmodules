@@ -38,3 +38,7 @@
 [submodule "ceammc/extra/fmt"]
 	path = ceammc/extra/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "ceammc/extra/hoa/HoaLibrary-PD"]
+	path = ceammc/extra/hoa/HoaLibrary-PD
+	url = https://github.com/njazz/HoaLibrary-PD
+	branch = dev-cmake

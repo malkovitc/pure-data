@@ -26,6 +26,8 @@ if(WITH_FLUIDSYNTH)
     add_subdirectory(fluidsynth)
 endif()
 
+add_subdirectory(hoa)
+
 
 set(EXTRA_COMPLETION "extra_objects.txt")
 add_custom_target(_ceammc_extra_misc SOURCES ${EXTRA_COMPLETION})
