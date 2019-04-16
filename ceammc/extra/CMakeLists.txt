@@ -28,6 +28,10 @@ endif()
 
 add_subdirectory(hoa)
 
+if(UNIX)
+    set_target_properties(fmt PROPERTIES COMPILE_FLAGS "-fPIC")
+endif()
+
 
 set(EXTRA_COMPLETION "extra_objects.txt")
 add_custom_target(_ceammc_extra_misc SOURCES ${EXTRA_COMPLETION})

@@ -1,8 +1,9 @@
 include(PdExternal)
-include(../../ext/src/ceammc_pd.cmake)
+# include(../../ext/src/ceammc_pd.cmake)
 
 add_definitions(-DPD)
 include_directories(${PROJECT_SOURCE_DIR}/src)
+
 # include_directories(${PROJECT_SOURCE_DIR}/ceammc/ext/src/lib/cicm/Sources)
 include_directories(HoaLibrary-PD/ThirdParty/CicmWrapper/Sources/)
 
@@ -59,6 +60,7 @@ HoaLibrary-PD/Sources/hoa.wider_tilde.cpp
 )
 
 SET_SOURCE_FILES_PROPERTIES( ${HOA_SOURCES_STATIC} PROPERTIES LANGUAGE CXX )
+SET_SOURCE_FILES_PROPERTIES( ${HOA_WRAPPER_ORIGINAL_C} PROPERTIES LANGUAGE C )
 
 set (HOA_SOURCES
 HoaLibrary-PD/hoa.library.cpp
