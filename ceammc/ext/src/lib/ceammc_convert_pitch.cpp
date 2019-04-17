@@ -1,4 +1,4 @@
-#define BOOST_MATH_DISABLE_FLOAT128 1
+#define BOOST_MATH_DISABLE_FLOAT128
 #include "ceammc_convert.h"
 
 #include <boost/unordered_map.hpp>

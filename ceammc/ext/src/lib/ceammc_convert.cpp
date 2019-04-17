@@ -11,9 +11,9 @@
  * contact the author of this file, or the owner of the project in which
  * this file belongs to.
  *****************************************************************************/
+#define BOOST_MATH_DISABLE_FLOAT128
 #include "ceammc_convert.h"
 
-#define BOOST_MATH_DISABLE_FLOAT128 1
 #include <boost/math/constants/constants.hpp>
 #include <cctype>
 #include <cmath>
